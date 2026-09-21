@@ -1,80 +1,107 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
 import { products, categories } from '../data/products'
 import ProductCard from '../components/ProductCard'
 import CategoryCard from '../components/CategoryCard'
 
 export default function Home({ addToCart, toggleWishlist, isInWishlist }) {
+  const [heroIndex, setHeroIndex] = useState(0)
+  const [scrollPos, setScrollPos] = useState(0)
+
   const newArrivals = products.slice(0, 8)
   const trendingProducts = products.slice(8, 14)
 
+  const heroImages = [
+    'https://images.pexels.com/photos/2769274/pexels-photo-2769274.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/3622621/pexels-photo-3622621.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1600'
+  ]
+
+  const nextHero = () => setHeroIndex((prev) => (prev + 1) % heroImages.length)
+  const prevHero = () => setHeroIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length)
+
   return (
     <div>
-      {/* Hero Section */}
-      <section className="relative h-screen md:h-[600px] bg-gray-900 overflow-hidden">
+      {/* Hero Carousel */}
+      <section className="relative h-[400px] md:h-[600px] bg-gray-900 overflow-hidden">
         <img
-          src="https://images.pexels.com/photos/2769274/pexels-photo-2769274.jpeg?auto=compress&cs=tinysrgb&w=1600"
+          src={heroImages[heroIndex]}
           alt="Hero"
-          className="w-full h-full object-cover opacity-70"
+          className="w-full h-full object-cover transition-opacity duration-500"
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 max-w-4xl">DEFINE YOUR EVERYDAY</h1>
-          <p className="text-lg md:text-xl mb-8 max-w-xl text-gray-200">Modern fashion, rooted in Punjab and designed for your everyday.</p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link
-              to="/shop"
-              className="px-8 py-3 bg-red-600 text-white font-bold text-lg hover:bg-red-700 transition"
-            >
-              SHOP MEN
-            </Link>
-            <Link
-              to="/shop"
-              className="px-8 py-3 border-2 border-white text-white font-bold text-lg hover:bg-white hover:text-red-600 transition"
-            >
-              SHOP WOMEN
-            </Link>
-          </div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4 bg-black/30">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 max-w-4xl">DEFINE YOUR EVERYDAY</h1>
+          <p className="text-base md:text-lg mb-8 max-w-xl text-gray-100">Modern fashion, rooted in Punjab</p>
+        </div>
+
+        {/* Carousel Controls */}
+        <button onClick={prevHero} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full transition z-10">
+          <ChevronLeft size={24} className="text-black" />
+        </button>
+        <button onClick={nextHero} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full transition z-10">
+          <ChevronRight size={24} className="text-black" />
+        </button>
+
+        {/* Dots */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {heroImages.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setHeroIndex(idx)}
+              className={`w-2 h-2 rounded-full transition ${idx === heroIndex ? 'bg-white w-6' : 'bg-white/50'}`}
+            />
+          ))}
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Shop by Category */}
-        <section className="py-16 md:py-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-neutral-dark mb-4">SHOP BY CATEGORY</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        {/* Shop by Category - Circular */}
+        <section className="py-12 md:py-16 border-b border-gray-200">
+          <div className="flex gap-6 md:gap-8 overflow-x-auto pb-4 justify-center">
             {categories.map(category => (
-              <CategoryCard key={category.id} category={category} />
+              <Link key={category.id} to="/shop" className="flex flex-col items-center gap-3 flex-shrink-0">
+                <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-gray-200 hover:border-red-600 transition">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-full object-cover hover:scale-110 transition-transform"
+                  />
+                </div>
+                <p className="text-sm font-medium text-neutral-dark text-center">{category.name}</p>
+              </Link>
             ))}
           </div>
         </section>
 
-        {/* New Arrivals */}
-        <section className="py-16 md:py-24 border-t border-border-color">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-neutral-dark mb-2">NEW ARRIVALS</h2>
-            <p className="text-text-secondary">Fresh pieces. New season.</p>
+        {/* New This Week - Horizontal Scroll */}
+        <section className="py-12 md:py-16 border-b border-gray-200">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-neutral-dark">NEW THIS WEEK</h2>
+            <Link to="/shop" className="text-sm font-semibold text-red-600 hover:text-red-700">SEE ALL →</Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {newArrivals.map(product => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onAddToCart={addToCart}
-                onWishlistToggle={toggleWishlist}
-                isInWishlist={isInWishlist}
-              />
-            ))}
-          </div>
-          <div className="text-center mt-12">
-            <Link
-              to="/shop"
-              className="inline-flex items-center gap-2 text-neutral-dark font-semibold hover:text-text-secondary transition"
-            >
-              VIEW ALL
-              <ArrowRight size={16} />
-            </Link>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <div className="flex gap-4 pb-2 w-max">
+              {newArrivals.map(product => (
+                <div key={product.id} className="flex-shrink-0 w-40 md:w-48">
+                  <Link to={`/product/${product.id}`} className="block">
+                    <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-2 hover:shadow-lg transition">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                      />
+                    </div>
+                  </Link>
+                  <p className="text-sm font-medium text-neutral-dark truncate">{product.name}</p>
+                  <p className="text-xs text-text-secondary mb-2">{product.category}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-neutral-dark">₹{product.price}</span>
+                    <span className="line-through text-xs text-text-secondary">₹{product.originalPrice}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 

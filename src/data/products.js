@@ -5,7 +5,7 @@ export const products = [
     category: 'T-Shirts',
     price: 1499,
     originalPrice: 1999,
-    image: 'https://images.pexels.com/photos/3622622/pexels-photo-3622622.jpeg?auto=compress&cs=tinysrgb&w=600',
+    image: 'https://images.pexels.com/photos/3622622/pexels-photo-3622622.jpeg?auto=compress&cs=tinysrgb&w=600&h=700&crop=faces&fit=crop',
     colors: ['Black', 'White', 'Grey', 'Navy'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     rating: 4.8,
